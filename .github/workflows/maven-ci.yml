@@ -46,7 +46,6 @@ jobs:
 
     - name: Build and Test with Maven
       run: mvn clean verify
-      working-directory: ./demo/demo
       env:
         DB_USERNAME: root
         DB_PASSWORD: test_password
@@ -60,14 +59,13 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: test-results
-        path: demo/demo/target/surefire-reports/
+        path: target/surefire-reports/
 
     - name: Build JAR artifact
       run: mvn package -DskipTests
-      working-directory: ./demo/demo
 
     - name: Upload JAR artifact
       uses: actions/upload-artifact@v4
       with:
         name: campus-dashboard-jar
-        path: demo/demo/target/campus-dashboard-1.0.0.jar
+        path: target/campus-dashboard-1.0.0.jar
