@@ -1,5 +1,5 @@
 -- 创建用户表
-CREATE TABLE `user` (
+CREATE TABLE IF NOT EXISTS `user` (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE COMMENT '用户名',
     password VARCHAR(255) NOT NULL COMMENT '密码（BCrypt加密）',
@@ -12,7 +12,7 @@ CREATE TABLE `user` (
 );
 
 -- 创建消费记录表
-CREATE TABLE consumption_record (
+CREATE TABLE IF NOT EXISTS consumption_record (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT NOT NULL COMMENT '用户ID',
     category VARCHAR(50) NOT NULL COMMENT '消费类别',
@@ -24,13 +24,13 @@ CREATE TABLE consumption_record (
 
 -- 插入测试用户数据（密码都是123456的BCrypt加密值）
 -- BCrypt每次生成的密文都不同，但都可以验证密码123456
-INSERT INTO user (username, password, real_name, email, phone, role) VALUES
+INSERT IGNORE INTO user (username, password, real_name, email, phone, role) VALUES
 ('admin', '$2a$10$49NVnzOpIe108MXGOWqom.fZ3S2FG0c2xY9cfEQ7yOjud1bwSmKqO', '管理员', 'admin@example.com', '13800138000', 'ADMIN'),
 ('zhangsan', '$2a$10$49NVnzOpIe108MXGOWqom.fZ3S2FG0c2xY9cfEQ7yOjud1bwSmKqO', '张三', 'zhangsan@example.com', '13800138001', 'USER'),
 ('lisi', '$2a$10$49NVnzOpIe108MXGOWqom.fZ3S2FG0c2xY9cfEQ7yOjud1bwSmKqO', '李四', 'lisi@example.com', '13800138002', 'USER');
 
 -- 插入测试消费记录数据
-INSERT INTO consumption_record (user_id, category, amount, description) VALUES
+INSERT IGNORE INTO consumption_record (user_id, category, amount, description) VALUES
 (2, '食堂', 15.50, '午餐'),
 (2, '超市', 32.00, '购买生活用品'),
 (2, '食堂', 12.00, '早餐'),
@@ -39,13 +39,13 @@ INSERT INTO consumption_record (user_id, category, amount, description) VALUES
 (2, '图书馆', 5.00, '打印资料');
 
 -- 创建索引优化查询性能
-CREATE INDEX idx_user_id ON consumption_record(user_id);
-CREATE INDEX idx_create_time ON consumption_record(create_time);
-CREATE INDEX idx_category ON consumption_record(category);
-CREATE INDEX idx_username ON user(username);
+CREATE INDEX IF NOT EXISTS idx_user_id ON consumption_record(user_id);
+CREATE INDEX IF NOT EXISTS idx_create_time ON consumption_record(create_time);
+CREATE INDEX IF NOT EXISTS idx_category ON consumption_record(category);
+CREATE INDEX IF NOT EXISTS idx_username ON user(username);
 
 -- 创建操作日志表
-CREATE TABLE operation_log (
+CREATE TABLE IF NOT EXISTS operation_log (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT COMMENT '用户ID',
     username VARCHAR(50) COMMENT '用户名',
@@ -59,5 +59,5 @@ CREATE TABLE operation_log (
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
 );
 
-CREATE INDEX idx_user_id_log ON operation_log(user_id);
-CREATE INDEX idx_create_time_log ON operation_log(create_time);
+CREATE INDEX IF NOT EXISTS idx_user_id_log ON operation_log(user_id);
+CREATE INDEX IF NOT EXISTS idx_create_time_log ON operation_log(create_time);
