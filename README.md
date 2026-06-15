@@ -2,6 +2,8 @@
 
 基于 Spring Boot 3 + MyBatis-Plus + Redis 的数据分析平台，实现用户认证、消费记录管理、数据统计分析与 Excel 导出等核心功能。
 
+**在线演示：** [https://campus-dashboard-production.up.railway.app](https://campus-dashboard-production.up.railway.app)
+
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.13-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![MyBatis-Plus](https://img.shields.io/badge/MyBatis--Plus-3.5.7-blue.svg)](https://baomidou.com/)
 [![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/)
