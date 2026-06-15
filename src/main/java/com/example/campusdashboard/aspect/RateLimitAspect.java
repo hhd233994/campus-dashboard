@@ -3,25 +3,37 @@ package com.example.campusdashboard.aspect;
 import com.example.campusdashboard.annotation.RateLimit;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 接口限流切面
- * 基于Redis实现滑动窗口限流
+ * 基于内存实现滑动窗口限流（替代Redis）
  */
 @Aspect
 @Component
 public class RateLimitAspect {
     
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    // 使用ConcurrentHashMap存储限流计数：key -> (count, expireTime)
+    private final ConcurrentHashMap<String, LimitInfo> limitMap = new ConcurrentHashMap<>();
+    
+    /**
+     * 限流信息内部类
+     */
+    private static class LimitInfo {
+        AtomicLong count;
+        long expireTime;
+        
+        LimitInfo(long expireTime) {
+            this.count = new AtomicLong(0);
+            this.expireTime = expireTime;
+        }
+    }
     
     /**
      * 在方法执行前进行限流检查
@@ -45,18 +57,20 @@ public class RateLimitAspect {
         
         int timeWindow = rateLimit.timeWindow();
         int maxRequests = rateLimit.maxRequests();
+        long currentTime = System.currentTimeMillis();
+        long expireTime = currentTime + timeWindow * 1000;
         
-        // 获取当前请求次数
-        Long count = redisTemplate.opsForValue().increment(key);
+        // 获取或创建限流信息
+        LimitInfo info = limitMap.computeIfAbsent(key, k -> new LimitInfo(expireTime));
         
-        if (count == null) {
-            return;
+        // 如果已过期，重置计数
+        if (currentTime > info.expireTime) {
+            info.count.set(0);
+            info.expireTime = expireTime;
         }
         
-        // 如果是第一次请求，设置过期时间
-        if (count == 1) {
-            redisTemplate.expire(key, timeWindow, TimeUnit.SECONDS);
-        }
+        // 增加计数
+        long count = info.count.incrementAndGet();
         
         // 超过限制，抛出异常
         if (count > maxRequests) {
