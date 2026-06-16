@@ -1,7 +1,6 @@
 package com.example.campusdashboard.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,21 +18,9 @@ import java.sql.Connection;
 @Configuration
 public class DatabaseInitConfig {
 
-    @Value("${spring.datasource.url:NOT_SET}")
-    private String dbUrl;
-    
-    @Value("${spring.datasource.username:NOT_SET}")
-    private String dbUsername;
-
     @Bean
     public CommandLineRunner initDatabase(DataSource dataSource) {
         return args -> {
-            // 打印数据库配置用于调试
-            log.info("=== 数据库配置检查 ===");
-            log.info("DB_URL: {}", dbUrl);
-            log.info("DB_USERNAME: {}", dbUsername);
-            log.info("=====================");
-            
             try (Connection connection = dataSource.getConnection()) {
                 log.info("开始初始化数据库表结构...");
                 
