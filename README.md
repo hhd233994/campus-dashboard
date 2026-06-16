@@ -29,13 +29,13 @@
 
 | 层次 | 技术 |
 |------|------|
-| 后端框架 | Spring Boot 3.5、MyBatis-Plus 3.5 |
-| 数据库 | MySQL 8.0、Redis 6.0+ |
-| 安全认证 | JWT（jjwt）、BCrypt |
+| 后端框架 | Spring Boot 3.5.13、MyBatis-Plus 3.5.7 |
+| 数据库 | MySQL 8.0、Caffeine（本地缓存） |
+| 安全认证 | JWT（jjwt）、BCrypt、Spring Security |
 | 数据导出 | EasyExcel |
-| 前端 | HTML5 / CSS3 / JavaScript、ECharts 5.4 |
-| 接口文档 | Knife4j |
-| 部署 | Docker、GitHub Actions CI/CD |
+| 前端 | HTML5 / CSS3 / JavaScript、ECharts 5.4、TailwindCSS |
+| 接口文档 | Knife4j（Swagger UI） |
+| 部署 | Docker、Railway PaaS、GitHub Actions CI/CD |
 | 测试 | JUnit 5、MockMvc |
 
 ---
@@ -59,9 +59,11 @@
 
 **安全与工程化**
 - 基于 AOP + `@OperationLog` 自定义注解实现操作日志自动记录
-- 基于 Redis 滑动窗口算法的接口限流（`@RateLimit` 注解）
+- 基于 Redis/Caffeine 滑动窗口算法的接口限流（`@RateLimit` 注解）
+- Spring Security + JWT 双重认证机制
 - 完整的 Controller / Service 层单元测试（9个测试类）
 - GitHub Actions 自动化 CI 流程，Docker 一键部署
+- Railway PaaS 生产环境部署
 
 ---
 
@@ -72,7 +74,7 @@
 - JDK 17+
 - Maven 3.6+
 - MySQL 8.0+
-- Redis 6.0+
+- （可选）Redis 6.0+ / Caffeine（本地缓存）
 
 ### 方式一：Maven 运行（开发环境）
 
@@ -91,24 +93,46 @@ mvn spring-boot:run
 docker-compose up -d
 ```
 
-### 方式三：Railway 一键部署（在线演示推荐）
+### 方式三：Railway 一键部署（在线演示推荐）✨
 
-1. 将代码推送到 GitHub
+本项目已成功部署到 Railway PaaS 平台，提供**永久免费的在线演示环境**。
+
+#### 快速部署步骤：
+
+1. **Fork 本仓库**到你的 GitHub 账号
 2. 访问 [railway.app](https://railway.app)，使用 GitHub 登录
-3. 新建 Project，选择 `Deploy from GitHub repo`，导入本仓库
-4. 在 Project 中分别添加 **MySQL** 和 **Redis** 插件
-5. 在应用的 Variables 中配置以下环境变量：
+3. 新建 Project，选择 `Deploy from GitHub repo`，导入你的 Fork 仓库
+4. 在 Project 中添加 **MySQL** 插件（免费套餐包含 500MB 存储）
+5. 在应用的 Variables 中配置以下环境变量（使用 Railway 变量引用语法）：
 
-| 变量名 | 值 |
-|--------|----|
-| `DB_URL` | 从 MySQL 插件连接信息中复制 |
-| `DB_USERNAME` | `root` |
-| `DB_PASSWORD` | MySQL 插件生成的密码 |
-| `REDIS_HOST` | 从 Redis 插件连接信息中复制 |
-| `REDIS_PORT` | `6379` |
-| `JWT_SECRET` | 任意随机字符串 |
+| 变量名 | 值（点击 {} 按钮选择变量引用） |
+|--------|------------------------------|
+| `DB_HOST` | `${{MySQL.MYSQLHOST}}` |
+| `DB_PORT` | `${{MySQL.MYSQLPORT}}` |
+| `DB_NAME` | `${{MySQL.MYSQLDATABASE}}` |
+| `DB_USERNAME` | `${{MySQL.MYSQLUSER}}` |
+| `DB_PASSWORD` | `${{MySQL.MYSQLPASSWORD}}` |
+| `JWT_SECRET` | 自定义随机字符串（至少32位） |
 
-6. 部署成功后，在 Settings → Networking 中开启公网访问（Generate Domain）
+6. **重要：** 删除默认的 `REDIS_HOST`、`REDIS_PORT` 等 Redis 相关变量（Railway 免费版不支持 Redis）
+7. 等待自动部署完成（约 2-5 分钟）
+8. 在 Settings → Networking 中开启公网访问（Generate Domain）
+9. 访问生成的域名即可使用
+
+#### 数据库初始化：
+
+首次部署后，需要手动执行 SQL 脚本创建表结构和测试数据：
+
+1. 在 Railway Dashboard 中点击 MySQL 服务 → **Connect** → **Database** 标签页
+2. 复制 `src/main/resources/sql/schema.sql` 文件内容
+3. 粘贴到文本框中，点击 **Execute**
+4. 刷新应用页面，即可看到测试数据
+
+#### 查看部署状态：
+
+- **HTTP Logs**：查看所有 API 请求日志
+- **Deployments**：查看每次代码推送后的构建和部署日志
+- **Variables**：确认环境变量是否正确配置
 
 ### 数据库配置
 
@@ -176,13 +200,37 @@ spring.data.redis.password=
 
 ## 数据库设计
 
-**user 表**：用户信息（username、password、role 等）
+### 核心表结构
 
-**consumption_record 表**：消费记录，建立 `idx_user_id`、`idx_create_time`、`idx_category` 复合索引优化查询性能
+**user 表**：用户信息表
+- `id`：主键，自增
+- `username`：用户名（唯一索引）
+- `password`：BCrypt 加密后的密码
+- `role`：角色（ADMIN / USER）
+- `create_time`：创建时间
 
-**operation_log 表**：操作审计日志，记录用户操作类型、IP、耗时等信息
+**consumption_record 表**：消费记录表
+- `id`：主键，自增
+- `user_id`：用户 ID（外键，关联 user.id）
+- `category`：消费类别（食堂、超市、网吧等）
+- `amount`：消费金额（DECIMAL(10,2)）
+- `description`：备注说明
+- `create_time`：消费时间
+- **索引优化**：建立 `idx_user_id`、`idx_create_time`、`idx_category` 复合索引，提升查询性能
 
-详细表结构参见 `src/main/resources/sql/schema.sql`。
+**operation_log 表**：操作审计日志表
+- `id`：主键，自增
+- `user_id`：操作用户 ID
+- `username`：操作用户名
+- `operation`：操作类型（ADD / UPDATE / DELETE / QUERY）
+- `module`：操作模块
+- `description`：操作描述
+- `ip`：客户端 IP 地址
+- `duration`：请求耗时（毫秒）
+- `create_time`：操作时间
+- **索引优化**：建立 `idx_user_id`、`idx_create_time` 索引
+
+详细 SQL 脚本参见 `src/main/resources/sql/schema.sql`。
 
 ---
 

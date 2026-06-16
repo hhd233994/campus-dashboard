@@ -28,15 +28,6 @@ public class JwtUtil {
     private long expirationTime;
     
     /**
-     * 初始化时打印密钥信息（用于调试）
-     */
-    @jakarta.annotation.PostConstruct
-    public void init() {
-        System.out.println("[DEBUG] JWT Secret 长度: " + (secretKey != null ? secretKey.length() : 0));
-        System.out.println("[DEBUG] JWT Secret 前缀: " + (secretKey != null && secretKey.length() > 10 ? secretKey.substring(0, 10) : "N/A"));
-    }
-    
-    /**
      * 生成密钥
      */
     private SecretKey getSignKey() {
