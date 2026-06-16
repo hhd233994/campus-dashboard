@@ -632,9 +632,16 @@
         async function loadDashboardData() {
             try {
                 showLoading();
+                console.log('[DEBUG] Token:', token);
+                console.log('[DEBUG] Token 长度:', token ? token.length : 0);
+                
                 const response = await fetch('/api/record/statistics/overview', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+                
+                console.log('[DEBUG] Response status:', response.status);
+                console.log('[DEBUG] Response headers:', [...response.headers.entries()]);
+                
                 const result = await response.json();
                 
                 if (result.code === 401) {
