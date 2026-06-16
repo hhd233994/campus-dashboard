@@ -39,10 +39,10 @@ INSERT IGNORE INTO consumption_record (user_id, category, amount, description) V
 (2, '图书馆', 5.00, '打印资料');
 
 -- 创建索引优化查询性能
-CREATE INDEX IF NOT EXISTS idx_user_id ON consumption_record(user_id);
-CREATE INDEX IF NOT EXISTS idx_create_time ON consumption_record(create_time);
-CREATE INDEX IF NOT EXISTS idx_category ON consumption_record(category);
-CREATE INDEX IF NOT EXISTS idx_username ON user(username);
+CREATE INDEX idx_user_id ON consumption_record(user_id);
+CREATE INDEX idx_create_time ON consumption_record(create_time);
+CREATE INDEX idx_category ON consumption_record(category);
+CREATE INDEX idx_username ON user(username);
 
 -- 创建操作日志表
 CREATE TABLE IF NOT EXISTS operation_log (
@@ -59,5 +59,5 @@ CREATE TABLE IF NOT EXISTS operation_log (
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
 );
 
-CREATE INDEX IF NOT EXISTS idx_user_id_log ON operation_log(user_id);
-CREATE INDEX IF NOT EXISTS idx_create_time_log ON operation_log(create_time);
+CREATE INDEX idx_user_id_log ON operation_log(user_id);
+CREATE INDEX idx_create_time_log ON operation_log(create_time);
