@@ -18,7 +18,7 @@
         </div>
       </template>
       
-      <el-table :data="categoryStats" stripe style="width: 100%">
+      <el-table :data="categoryStats" style="width: 100%">
         <el-table-column prop="category" label="类别" width="150">
           <template #default="{ row }">
             <el-tag :type="getCategoryType(row.category)">
@@ -29,7 +29,7 @@
         <el-table-column prop="count" label="消费次数" width="150" />
         <el-table-column prop="totalAmount" label="总金额" width="150">
           <template #default="{ row }">
-            <span style="color: #f56c6c; font-weight: bold">¥{{ row.totalAmount.toFixed(2) }}</span>
+            <span class="amount-highlight">¥{{ row.totalAmount.toFixed(2) }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="avgAmount" label="平均金额" width="150">
@@ -196,13 +196,126 @@ onMounted(() => {
   padding: 0;
 }
 
-.chart-card,
+/* 图表卡片 */
+.chart-card {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  background: #FFFFFF;
+  overflow: hidden;
+}
+
+.chart-card :deep(.el-card__header) {
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-light);
+  padding: 16px 24px;
+}
+
+/* 表格卡片 */
 .table-card {
-  border-radius: 8px;
+  margin-top: 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  background: #FFFFFF;
+  overflow: hidden;
+}
+
+.table-card :deep(.el-card__header) {
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-light);
+  padding: 16px 24px;
 }
 
 .card-header {
-  font-weight: bold;
+  font-weight: 600;
   font-size: 16px;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+/* 表格样式 - 清新典雅版 */
+.table-card :deep(.el-table) {
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.table-card :deep(.el-table__header-wrapper th) {
+  background: var(--bg-tertiary) !important;
+  color: var(--text-secondary);
+  font-weight: 600;
+  padding: 16px 0;
+  border-bottom: 2px solid var(--border-color) !important;
+  letter-spacing: 0.5px;
+}
+
+.table-card :deep(.el-table__body-wrapper td) {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-light) !important;
+  color: var(--text-primary);
+}
+
+/* 去除斑马纹 */
+.table-card :deep(.el-table--striped .el-table__body tr.el-table__row--striped td) {
+  background: transparent !important;
+}
+
+/* 行悬停效果 - 左侧主色竖条指示器 */
+.table-card :deep(.el-table__body-wrapper tr:hover) {
+  background: rgba(74, 108, 247, 0.03) !important;
+  position: relative;
+}
+
+.table-card :deep(.el-table__body-wrapper tr:hover td:first-child) {
+  position: relative;
+}
+
+.table-card :deep(.el-table__body-wrapper tr:hover td:first-child::before) {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: var(--gradient-primary);
+  border-radius: 0 2px 2px 0;
+}
+
+/* 类别标签 - 柔和配色 */
+.table-card :deep(.el-tag) {
+  border-radius: var(--radius-sm) !important;
+  padding: 6px 14px !important;
+  font-weight: 500;
+  border: none !important;
+  font-size: 13px;
+}
+
+.table-card :deep(.el-tag--warning) {
+  background: rgba(245, 201, 122, 0.15);
+  color: #D4A85C;
+}
+
+.table-card :deep(.el-tag--success) {
+  background: rgba(123, 198, 126, 0.12);
+  color: #5BA85E;
+}
+
+.table-card :deep(.el-tag--info) {
+  background: rgba(107, 141, 214, 0.12);
+  color: #4A6CB5;
+}
+
+.table-card :deep(.el-tag--danger) {
+  background: rgba(239, 68, 68, 0.1);
+  color: #DC4A4A;
+}
+
+/* 金额列特殊样式 */
+.amount-highlight {
+  color: var(--primary-color);
+  font-weight: 700;
+  font-size: 15px;
 }
 </style>

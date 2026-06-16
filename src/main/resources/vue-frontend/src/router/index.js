@@ -39,6 +39,11 @@ const routes = [
         component: () => import('@/views/Logs.vue'),
         meta: { requiresAdmin: true },
       },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: () => import('@/views/Profile.vue'),
+      },
     ],
   },
 ]
