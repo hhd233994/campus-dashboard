@@ -29,8 +29,8 @@ public class DatabaseInitConfig {
                 
                 log.info("数据库表结构初始化完成！");
             } catch (Exception e) {
-                log.error("数据库初始化失败", e);
-                throw new RuntimeException("数据库初始化失败", e);
+                log.warn("数据库初始化失败（可能表已存在），继续启动应用", e);
+                // 不抛出异常，允许应用继续启动
             }
         };
     }
