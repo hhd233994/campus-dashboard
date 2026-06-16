@@ -131,6 +131,23 @@
 	</dependencies>
 
 	<build>
+		<!-- 资源文件配置 -->
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<!-- 排除前端 node_modules 目录（避免 Maven 复制大量文件） -->
+					<exclude>vue-frontend/node_modules/**</exclude>
+					<!-- 排除前端开发源代码（只保留构建产物） -->
+					<exclude>vue-frontend/src/**</exclude>
+					<!-- 排除前端配置文件 -->
+					<exclude>vue-frontend/*.json</exclude>
+					<exclude>vue-frontend/*.js</exclude>
+					<exclude>vue-frontend/*.config.*</exclude>
+				</excludes>
+			</resource>
+		</resources>
+		
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
