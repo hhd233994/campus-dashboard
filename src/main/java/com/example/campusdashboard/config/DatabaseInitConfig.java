@@ -13,6 +13,8 @@ import java.sql.Connection;
 /**
  * 数据库初始化配置
  * 在应用启动时自动执行 schema.sql 创建表结构
+ * 
+ * 注意：此组件会在 DataSource 初始化后执行，确保数据库连接可用
  */
 @Slf4j
 @Configuration
