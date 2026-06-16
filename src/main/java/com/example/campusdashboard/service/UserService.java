@@ -30,4 +30,18 @@ public interface UserService {
      * @return 用户信息
      */
     User getUserByUsername(String username);
+    
+    /**
+     * 根据ID查询用户
+     * @param id 用户ID
+     * @return 用户信息
+     */
+    User getById(Long id);
+    
+    /**
+     * 更新用户信息
+     * @param user 用户信息
+     * @return 是否更新成功
+     */
+    boolean updateById(User user);
 }

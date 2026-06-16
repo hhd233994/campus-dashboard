@@ -91,4 +91,15 @@ public class UserServiceImpl implements UserService {
         wrapper.eq(User::getUsername, username);
         return userMapper.selectOne(wrapper);
     }
+    
+    @Override
+    public User getById(Long id) {
+        return userMapper.selectById(id);
+    }
+    
+    @Override
+    public boolean updateById(User user) {
+        user.setUpdateTime(LocalDateTime.now());
+        return userMapper.updateById(user) > 0;
+    }
 }
