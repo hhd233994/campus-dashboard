@@ -50,6 +50,8 @@ public class SecurityConfig {
                     "/v3/api-docs/**",
                     "/webjars/**"
                 ).permitAll()
+                // /api/** 路径由 JwtInterceptor 处理认证，Spring Security 不拦截
+                .requestMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()
             );
         
