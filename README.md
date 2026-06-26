@@ -1,6 +1,6 @@
-# 校园消费数据管理平台
+# 个人财务管理系统
 
-基于 **Spring Boot 3 + Vue 3 + Element Plus** 的全栈数据分析平台，实现用户认证、消费记录管理、数据统计分析与 Excel 导出等核心功能。
+基于 **Spring Boot 3 + Vue 3 + Element Plus** 的全栈数据分析平台，实现用户认证、财务记录管理、数据统计分析与 Excel 导出等核心功能。
 
 **在线演示：** [https://campus-dashboard-production.up.railway.app](https://campus-dashboard-production.up.railway.app)
 
@@ -22,7 +22,7 @@
 |---------|------------|
 | <!-- 在此插入 Login 截图 --> | <!-- 在此插入 Dashboard 截图 --> |
 
-| 消费记录管理 | 统计分析 |
+| 财务记录管理 | 统计分析 |
 |---------|---------|
 | <!-- 在此插入记录列表截图 --> | <!-- 在此插入分类统计截图 --> |
 
@@ -52,13 +52,13 @@
 - BCrypt 密码加密存储
 
 **业务功能**
-- 消费记录 CRUD，支持分页查询
-- 多维度条件筛选（日期范围、消费类别）
+- 财务记录 CRUD，支持分页查询
+- 多维度条件筛选（日期范围、支出类别、金额范围）
 - EasyExcel 高性能 Excel 数据导出
 
 **数据统计**
 - ECharts 可视化图表（饼图、折线图、柱状图）
-- 分类统计、每日趋势、总金额与今日消费统计
+- 分类统计、每日趋势、总金额与今日支出统计
 - Redis 缓存统计数据，Cache-Aside 策略降低数据库查询压力
 
 **安全与工程化**
@@ -325,7 +325,7 @@ Docker Compose 会自动读取 `.env` 文件中的变量。
 系统会在首次启动时自动执行 `src/main/resources/sql/schema.sql`，创建以下内容：
 
 - **user 表**：用户信息表（含测试账号）
-- **consumption_record 表**：消费记录表（含测试数据）
+- **consumption_record 表**：财务记录表（原 consumption_record）（含测试数据）
 - **operation_log 表**：操作审计日志表
 
 **手动执行（如需重置数据库）：**
@@ -350,8 +350,8 @@ mysql -u root -p campus_dashboard < src/main/resources/sql/schema.sql
 | 用户名 | 密码 | 角色 | 说明 |
 |--------|------|------|------|
 | admin | 123456 | 管理员 | 可访问所有功能，包括操作日志 |
-| zhangsan | 123456 | 普通用户 | 仅可查看自己的消费记录 |
-| lisi | 123456 | 普通用户 | 仅可查看自己的消费记录 |
+| zhangsan | 123456 | 普通用户 | 仅可查看自己的财务记录 |
+| lisi | 123456 | 普通用户 | 仅可查看自己的财务记录 |
 
 ---
 
@@ -364,14 +364,14 @@ mysql -u root -p campus_dashboard < src/main/resources/sql/schema.sql
 | POST | `/api/auth/login` | 用户登录 |
 | POST | `/api/auth/register` | 用户注册 |
 
-**消费记录**
+**财务记录**
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
-| POST | `/api/record/add` | 新增消费记录 |
+| POST | `/api/record/add` | 新增财务记录 |
 | GET | `/api/record/list` | 分页查询（支持筛选） |
-| GET | `/api/record/user/{userId}` | 查询用户消费记录 |
-| DELETE | `/api/record/{id}` | 删除消费记录 |
+| GET | `/api/record/user/{userId}` | 查询用户财务记录 |
+| DELETE | `/api/record/{id}` | 删除财务记录 |
 | GET | `/api/record/export/excel` | 导出 Excel |
 
 **统计分析**
@@ -380,8 +380,8 @@ mysql -u root -p campus_dashboard < src/main/resources/sql/schema.sql
 |------|------|------|
 | GET | `/api/record/statistics/category` | 分类统计 |
 | GET | `/api/record/statistics/daily` | 每日统计 |
-| GET | `/api/record/statistics/total` | 总消费金额 |
-| GET | `/api/record/statistics/today` | 今日消费金额 |
+| GET | `/api/record/statistics/total` | 总支出金额 |
+| GET | `/api/record/statistics/today` | 今日支出金额 |
 | GET | `/api/record/statistics/overview` | 数据概览（综合统计） |
 
 > 完整接口文档请访问 Knife4j：`http://localhost:8080/doc.html`
@@ -399,13 +399,13 @@ mysql -u root -p campus_dashboard < src/main/resources/sql/schema.sql
 - `role`：角色（ADMIN / USER）
 - `create_time`：创建时间
 
-**consumption_record 表**：消费记录表
+**consumption_record 表**：财务记录表
 - `id`：主键，自增
 - `user_id`：用户 ID（外键，关联 user.id）
-- `category`：消费类别（食堂、超市、网吧等）
-- `amount`：消费金额（DECIMAL(10,2)）
+- `category`：支出类别（餐饮、购物、交通、娱乐等）
+- `amount`：支出金额（DECIMAL(10,2)）
 - `description`：备注说明
-- `create_time`：消费时间
+- `create_time`：记录时间
 - **索引优化**：建立 `idx_user_id`、`idx_create_time`、`idx_category` 复合索引，提升查询性能
 
 **operation_log 表**：操作审计日志表

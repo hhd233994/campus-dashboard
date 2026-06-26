@@ -11,8 +11,8 @@
 	<groupId>com.example</groupId>
 	<artifactId>campus-dashboard</artifactId>
 	<version>1.0.0</version>
-	<name>campus-dashboard</name>
-	<description>校园消费数据管理平台 - 基于Spring Boot 3的全栈应用</description>
+	<name>personal-finance</name>
+	<description>个人财务管理系统 - 基于Spring Boot 3的全栈应用</description>
 	<url/>
 	<licenses>
 		<license/>

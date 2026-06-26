@@ -31,12 +31,12 @@ INSERT IGNORE INTO user (username, password, real_name, email, phone, role) VALU
 
 -- 插入测试消费记录数据
 INSERT IGNORE INTO consumption_record (user_id, category, amount, description) VALUES
-(2, '食堂', 15.50, '午餐'),
-(2, '超市', 32.00, '购买生活用品'),
-(2, '食堂', 12.00, '早餐'),
-(3, '食堂', 18.00, '晚餐'),
-(3, '网吧', 10.00, '上网2小时'),
-(2, '图书馆', 5.00, '打印资料');
+(2, '餐饮', 15.50, '午餐'),
+(2, '购物', 32.00, '购买生活用品'),
+(2, '餐饮', 12.00, '早餐'),
+(3, '餐饮', 18.00, '晚餐'),
+(3, '娱乐', 10.00, '电影票'),
+(2, '学习', 5.00, '购买文具');
 
 -- 创建索引优化查询性能
 CREATE INDEX idx_user_id ON consumption_record(user_id);
