@@ -50,6 +50,8 @@ public class SecurityConfig {
                 ).permitAll()
                 // /api/** 路径由 JwtInterceptor 处理认证，Spring Security 不拦截
                 .requestMatchers("/api/**").permitAll()
+                // 允许前端静态资源
+                .requestMatchers("/", "/index.html", "/vue-dist/**", "/static/**", "/assets/**", "/*.js", "/*.css", "/*.ico", "/*.png", "/*.svg").permitAll()
                 .anyRequest().authenticated()
             );
         

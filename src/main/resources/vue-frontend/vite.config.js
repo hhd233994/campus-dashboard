@@ -33,7 +33,8 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: '../static/vue-dist',
+    outDir: '../static',
     emptyOutDir: true,
+    assetsDir: 'assets',
   },
 })

@@ -1,1 +1,0 @@
-import{a2 as e}from"./index-Bq7oAwXF.js";const s=()=>e.get("/record/statistics/overview"),o=()=>e.get("/record/statistics/category"),c=t=>e.get("/record/list",{params:t}),a=()=>e.get("/record/export/excel",{responseType:"blob"});export{o as a,c as b,a as e,s as g};
